@@ -367,7 +367,7 @@ void objFile(instruct* tPtr) {
     int tRec_num = 0;
     int tRec_Len[10] = { 0 };
     int tRec_START[10] = { 0 };
-    for (i = 1; i < progLen - 1; i++) {
+    /*for (i = 1; i < progLen - 1; i++) {
         if (tRec_Len[tRec_num] < 0x1F) {
             if (strcmp(tPtr[i].Operator, "RESW") == 0 || strcmp(tPtr[i].Operator, "RESB") == 0) {
                 continue;
@@ -378,7 +378,7 @@ void objFile(instruct* tPtr) {
     }
     for (i = 0; i < tRec_num; i++) {
         printf("tRec_Len[%d] = %d\n", i, tRec_Len[i]);
-    }
+    }*/
     /*for (i=1; i < progLen-1; i++) {
         printf("%6s ", tPtr[i].ObjCode);
         if((i % 10)+1 == 1) {
