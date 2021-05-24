@@ -1,4 +1,4 @@
-﻿// SICASM.cpp : 此檔案包含 'main' 函式。程式會於該處開始執行及結束執行。
+// SICASM.cpp : 此檔案包含 'main' 函式。程式會於該處開始執行及結束執行。
 #define _CRT_SECURE_NO_WARNINGS
 #include <string>
 #include <stdio.h>
@@ -23,7 +23,7 @@ typedef struct instruct
     char Label[10]; // 標籤
     char Operator[6];  // 運算子
     char Operand[20]; // 運算元
-    char ObjCode[7];
+    char ObjCode[7];  
 } instruct;
 int progLen = 0;
 int SymTabLen = 0;
@@ -68,10 +68,7 @@ void fileInput(instruct* tptr)
 {
     int row = 0;
     FILE* fptr = NULL;
-    char filename_asm[50] = { "COPY.asm" };
-    //char filename_asm[50];
-    printf("Please enter your file:");
-    //fgets(filename_asm, 50, stdin);
+    char filename_asm[50] = {"COPY.asm"};
     printf("%s\n", filename_asm);
     for (unsigned int i = 0; i < strlen(filename_asm); i++) {
         if (filename_asm[i] != '.') {
@@ -90,7 +87,7 @@ void fileInput(instruct* tptr)
     while (!feof(fptr))
     {
         fgets(buf[row], 100, fptr);
-
+        
         if (buf[row][0] == '.')
         {
             continue;
@@ -141,7 +138,7 @@ void listFile(instruct* tPtr) {
     lstPtr = fopen(filename_lst, "w");
     for (int i = 0; i < progLen; i++) {
         fprintf(lstPtr, "%-6X%-8s%-8s%-9s%-6s\n", tPtr[i].Loc, tPtr[i].ObjCode, tPtr[i].Label, tPtr[i].Operator, tPtr[i].Operand);//%-6s
-        //printf("%-6X%-8s%-8s%-9s%-6s\n", tPtr[i].Loc, tPtr[i].Label, tPtr[i].Operator, tPtr[i].Operand, tPtr[i].ObjCode);
+        printf("%-6X%-8s%-8s%-9s%-6s\n", tPtr[i].Loc, tPtr[i].ObjCode, tPtr[i].Label, tPtr[i].Operator, tPtr[i].Operand);
     }
     fprintf(lstPtr, "\0");
     fclose(lstPtr);
@@ -152,7 +149,7 @@ int HexToDec(int hex) {
     int pow = 1;
     int tmp = hex;
     while (tmp) {
-        dec += (tmp % 10) * pow;
+        dec += (tmp % 10)*pow;
         tmp /= 10;
         pow *= 16;
     }
@@ -171,21 +168,16 @@ void makeSymTable(instruct* tPtr) {
             SymTabLen++;
         }
     }
-    //printf("Symble Table Len = %d\n", SymTabLen);
-    /*for (i = 0; i < SymTabLen; i++) {
-        printf("%s\t", SymTab[i].Label);
-        printf("%X\n", SymTab[i].Address);
-    }*/
 }
 int findOpTable(char* Oper) {
-    int i = 0, MCCode = 0;
-    int OpTabLen = sizeof(OPTAB) / sizeof(OPTAB[0]);
+    int i = 0, MCCode=0;
+    int OpTabLen = sizeof(OPTAB)/sizeof(OPTAB[0]);
     for (i = 0; i < OpTabLen; i++) {
         if (strcmp(Oper, OPTAB[i].Mnemonic) == 0) {
             MCCode = OPTAB[i].ManchineCode;
             return MCCode;
         }
-        else if (strcmp(Oper, "WORD") == 0 || strcmp(Oper, "BYTE") == 0) {
+        else if (strcmp(Oper, "WORD") == 0 || strcmp(Oper, "BYTE") == 0){
             return 0xfe;
         }
         else if (strcmp(Oper, "RESW") == 0 || strcmp(Oper, "RESB") == 0) {
@@ -193,6 +185,16 @@ int findOpTable(char* Oper) {
         }
     }
     return 0xff;
+}
+int findOpLen(char* Oper) {
+    int i = 0, len = 0;
+    int OpTabLen = sizeof(OPTAB) / sizeof(OPTAB[0]);
+    for (i = 0; i < OpTabLen; i++) {
+        if (strcmp(Oper, OPTAB[i].Mnemonic) == 0) {
+            len = OPTAB[i].Format-'0';
+            return len;
+        }
+    }
 }
 int findSymTable(char* Lable) {
     int i = 0, LabAdd = 0;
@@ -216,10 +218,9 @@ int findSymTable(char* Lable) {
         if (Lable[index] == ',') {
             strncpy(tmp, Lable, index);
             //printf("tmp = %s\n", tmp);
-            return findSymTable(tmp) + 0x8000;
+            return findSymTable(tmp)+0x8000;
         }
     }
-    //printf("\n");
     return 0x00;
 }
 void makeObjCode(instruct* tPtr) {
@@ -293,10 +294,10 @@ void makeObjCode(instruct* tPtr) {
 void displayOpTable(instruct* tPtr) {
     int i = 0;
     for (i = 0; i < progLen; i++) {
-        printf("[%-6s]\n", tPtr[i].ObjCode);
+            printf("[%-6s]\n", tPtr[i].ObjCode);
     }
 }
-void pass_1(instruct* tPtr) {
+void CalculateLOC(instruct* tPtr) {
     int LOCCTR = 0;
     int row = 0;
     for (row = 0; row < progLen; row++) {
@@ -305,13 +306,13 @@ void pass_1(instruct* tPtr) {
             Operand = HexToDec(Operand);
             //Operand = 0x4096;
             LOCCTR = Operand;
-            printf("START LOCCTR = %x\n", LOCCTR);
+            //printf("START LOCCTR = %x\n", LOCCTR);
             tPtr[row].Loc = LOCCTR;
         }
         else {
             tPtr[row].Loc = LOCCTR;
             char Operator[20] = { "\0" };
-            strncpy(Operator, tPtr[row].Operator, sizeof(tPtr[row].Operator));
+            strncpy(Operator, tPtr[row].Operator,sizeof(tPtr[row].Operator));
             //printf("Operator = %s\n", Operator);
             if (strcmp(Operator, "WORD") == 0) {
                 LOCCTR += 3;
@@ -334,7 +335,7 @@ void pass_1(instruct* tPtr) {
                 int diff = atoi(tPtr[row].Operand);
                 LOCCTR += diff;
             }
-            else {
+            else{
                 LOCCTR += 3;
             }
         }
@@ -350,40 +351,67 @@ void displayTable(instruct* tPtr) {
     }
 }
 void objFile(instruct* tPtr) {
+    FILE* ObjPtr = NULL;
+    char Obj[5] = ".obj";
+    char filename_obj[100] = { "" };
+    strcpy(filename_obj, filename);
+    strcat(filename_obj, Obj);
+    ObjPtr = fopen(filename_obj, "w");
     int max_byte = 30;
-    printf("tPtr[progLen].Operand = %s\n", tPtr[progLen - 1].Operand);
-    printf("tPtr[0].Loc = %X\n", tPtr[0].Loc);
-    int ProgLen_Loc = tPtr[progLen - 1].Loc - tPtr[0].Loc;
-    printf("ProgLen_Loc = %X\n", ProgLen_Loc);
+    int ProgLen_Loc = tPtr[progLen-1].Loc - tPtr[0].Loc;
     int i = 0;
-    printf("\nObjFile:\n");
+    fprintf(ObjPtr, "ObjFile:\n");
     // H record
-    printf("H %06s %06X\n", tPtr[i++].Operand, ProgLen_Loc);
+    fprintf(ObjPtr, "H %06s %06X\n", tPtr[i++].Operand, ProgLen_Loc);
     // T record
-    printf("T ");
     int tRec_num = 0;
     int tRec_Len[10] = { 0 };
-    int tRec_START[10] = { 0 };
-    /*for (i = 1; i < progLen - 1; i++) {
-        if (tRec_Len[tRec_num] < 0x1F) {
-            if (strcmp(tPtr[i].Operator, "RESW") == 0 || strcmp(tPtr[i].Operator, "RESB") == 0) {
-                continue;
+    int tRec_START[100] = { 0 };
+    bool changedRecord = false;
+    for (i = 1; i < progLen-1; i++) {
+        int objLen = (strlen(tPtr[i].ObjCode) / 2);
+        if (strcmp(tPtr[i].ObjCode, "      ") == 0) {
+            if (changedRecord == false) {
+                tRec_num++;
+                changedRecord = true;
             }
-            tRec_Len[tRec_num]++;
         }
-        tRec_num++;
+        else if (tRec_Len[tRec_num] + objLen <= 0x1E) {
+            changedRecord = false;
+            tRec_Len[tRec_num] += objLen;
+        }
+        else {
+            changedRecord = false;
+            tRec_num++;
+            tRec_Len[tRec_num] += objLen;
+        }
     }
-    for (i = 0; i < tRec_num; i++) {
-        printf("tRec_Len[%d] = %d\n", i, tRec_Len[i]);
-    }*/
-    /*for (i=1; i < progLen-1; i++) {
-        printf("%6s ", tPtr[i].ObjCode);
-        if((i % 10)+1 == 1) {
-            printf("\nT ");
+    i = 1;
+    int index = 0;
+    for(i=0 ; i<progLen;)
+    {
+        fprintf(ObjPtr, "T %02X ", tRec_Len[index]);
+        printf("T %02X ", tRec_Len[index]);
+        while(tRec_Len[index] != 0) {
+            if (strcmp(tPtr[i].ObjCode, "      ") != 0) {
+                fprintf(ObjPtr, "%s ", tPtr[i].ObjCode);
+                printf("%s ", tPtr[i].ObjCode);
+                tRec_Len[index] -= (strlen(tPtr[i].ObjCode) / 2);
+            }
+            i++;
         }
-    }*/
+        index++;
+        puts("");
+        fprintf(ObjPtr, "\n");
+        if (index > tRec_num) {
+            break;
+        }
+    }
     // E record
-    printf("\nE %06X\n", findSymTable(tPtr[progLen - 1].Operand));
+    fprintf(ObjPtr,"E%06X\n", findSymTable(tPtr[progLen - 1].Operand));
+    fprintf(ObjPtr, "\0");
+    fclose(ObjPtr);
+    printf("ObjFIle finished!!\n");
 }
 int main(void)
 {
@@ -391,15 +419,11 @@ int main(void)
     instruct table[100];
     instruct* t = table;
     fileInput(t);
-
-    printf("Pass 1 Processing...\n");
-    pass_1(t);
-    //makeSymTable(t);
+    
+    CalculateLOC(t);
     makeObjCode(t);
     listFile(t);
     objFile(t);
-    //displayOpTable(t);
-    //displayTable(t);
     return 0;
 }
 /*
