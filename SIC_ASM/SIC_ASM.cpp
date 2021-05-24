@@ -66,9 +66,6 @@ static SIC_OPTAB OPTAB[] =
 /**************** FUNCTION **************/
 void fileInput(instruct* tptr)
 {
-    // t[0].label = {"FIRST"};
-    // t[0].instr = {"LDA"};
-    // t[0].operand = {"ZERO"};
     int row = 0;
     FILE* fptr = NULL;
     char filename_asm[50] = { "COPY.asm" };
